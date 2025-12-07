@@ -42,7 +42,7 @@ def login_inicial():
     frame = ttk.Frame(win, padding=20)
     frame.pack(fill="both", expand=True)
 
-    ttk.Label(frame, text="Usuario / correo:").grid(row=0, column=0, sticky="w", pady=5)
+    ttk.Label(frame, text="Usuario:").grid(row=0, column=0, sticky="w", pady=5)
     entry_user = tk.Entry(frame, highlightthickness=2, highlightbackground="#5F9BE0", highlightcolor="green", width=35)
     entry_user.grid(row=0, column=1, pady=5)
 
@@ -102,6 +102,8 @@ def login_inicial():
         current_user = resultado["user"]
         lbl_help.config(text=f"Usuario conectado: {current_user.nombre} ({current_user.role})")
         ajustar_menu_por_rol()
+
+    if current_user.role == "Doctor":
         listar_consultas()
 
 
@@ -210,7 +212,10 @@ def registrar_usuario_publico():
             return
 
         telefono = entry_telefono.get().strip()
-        # telefono puede ser opcional en la BD (es NULLABLE) — lo dejamos aceptar vacío
+        if not telefono:
+            messagebox.showwarning("Falta telefono", "El el numero de telefono es obligatorio.")
+            return
+
         fechanac = entry_fechanac.get().strip()
         if not fechanac:
             messagebox.showwarning("Falta fecha", "La fecha de nacimiento es obligatoria (YYYY-MM-DD).")
@@ -341,6 +346,7 @@ def registrar_usuario():
         nombre = entry_nombre.get().strip()
         apellidos = entry_apellidos.get().strip()
         correo = entry_correo.get().strip()
+        telefono = entry_telefono.get().strip()
         role = cb_role.get().strip()
         pwd = entry_pwd.get()
 
@@ -351,13 +357,16 @@ def registrar_usuario():
         if not correo:
             messagebox.showwarning("Falta correo", "El correo es obligatorio.")
             return
-
+        
+        if not telefono:
+            messagebox.showwarning("Falta telefono", "El telefono es obligatorio.")
+            return
         try:
             u = Usuario.crear(
                 nombre,
                 apellidos,
                 correo,
-                None,              # teléfono nulo
+                telefono,              # teléfono nulo
                 "1900-01-01",      # fecha default como en tu versión original
                 'N',               # sexo por default
                 role,
@@ -480,7 +489,7 @@ def modificar_usuario():
         foreground="white", font=("Arial", 8, "bold"),
         relief="raised", bd=4,
         command=buscar_usuario
-    ).grid(row=1, column=2, padx=10)
+    ).grid(row=0, column=2, padx=10)
 
     # ---------- Guardar cambios ----------
     def guardar_cambios():
@@ -1235,6 +1244,23 @@ def modificar_consulta():
         command=guardar
     ).grid(row=3, column=0, columnspan=3, pady=20)
 
+
+def actualizar_lista_consultas(listbox_consultas):
+    """Limpia el Listbox de consultas y lo rellena con los datos actualizados de la DB."""
+    
+    listbox_consultas.delete(0, tk.END)
+    
+    consultas = bib.listar_consultas()
+    
+    for consulta in consultas:
+        texto = (
+            f"ID: {consulta.id} | Fecha: {consulta.fecha} | Hora: {consulta.hora} | "
+            f"Paciente: {consulta.nombre_paciente} | Doctor ID: {consulta.doctor} | "
+            f"Tipo: {consulta.tipo_consulta} | Estado: {consulta.estado}"
+        )
+        listbox_consultas.insert(tk.END, texto)
+
+
 def eliminar_consulta():
     win = tk.Toplevel()
     win.title("Eliminar consulta")
@@ -1301,35 +1327,21 @@ def listar_usuarios():
 
 
 def listar_consultas():
-    lb_output.delete(0, tk.END)
-
-    # PACIENTE — solo ve sus consultas
-    if current_user and current_user.role.lower() == "paciente":
-        consultas = Consulta.listar_por_paciente(current_user.id)
-
-        if not consultas:
-            lb_output.insert(tk.END, "No tienes consultas registradas.")
-            return
-        
-        lb_output.insert(tk.END, f"Consultas del paciente {current_user.nombre}:\n")
-        for c in consultas:
-            lb_output.insert(tk.END, f"[{c.id}] Fecha: {c.fecha}  Motivo: {c.motivo}")
-        return
-
-    # ADMIN o DOCTOR — ven todas
     try:
         consultas = Consulta.listar_todos()
+        lb_output.delete(0, tk.END)
         if not consultas:
             lb_output.insert(tk.END, "No hay consultas registradas.")
             return
-
-        lb_output.insert(tk.END, "Consultas (todas):")
+        lb_output.insert(tk.END, "Consultas:")
         for c in consultas:
-            lb_output.insert(tk.END, f"[{c.id}] Paciente: {c.paciente} - Fecha: {c.fecha} - Motivo: {c.motivo}")
-
+            status = "Disponible" if c.motivo else "No disponible"
+            lb_output.insert(tk.END, "")
+            lb_output.insert(tk.END, f"  [{c.id}] - ID del paciente: {c.paciente} - Nombre del Paciente: {c.nombre_paciente} - Fecha: {c.fecha} - Estado: ({status}) - Motivo: {c.motivo}")
     except Exception as e:
         messagebox.showerror("Error", f"Error al listar consultas:\n{e}")
-        
+
+
 def obtener_consultas_usuario():
     nombre = simpledialog.askstring("Consultas agendadas", "Nombre del usuario:")
     if not nombre:
@@ -1429,8 +1441,15 @@ def ajustar_menu_por_rol():
         acciones_menu.entryconfig("Eliminar consulta", state="disabled")
         # doctor puede agendar/cancelar y ver usuarios; paciente solo ver y agendar/cancelar sus consultas
         if (current_user.role or "").lower() == 'doctor':
-            acciones_menu.entryconfig("Mostrar usuarios", state="normal")
+            acciones_menu.entryconfig("Mostrar usuarios", state="disabled")
             acciones_menu.entryconfig("Mostrar consultas", state="normal")
+            acciones_menu.entryconfig("Eliminar consulta", state="normal")
+            acciones_menu.entryconfig("Registrar especialidad", state="disabled")
+            acciones_menu.entryconfig("Modificar especialidad", state="disabled")
+            acciones_menu.entryconfig("Eliminar especialidad", state="disabled")
+            acciones_menu.entryconfig("Mostrar especialidades", state="disabled") 
+            acciones_menu.entryconfig("Asignar especialidad a doctor", state="disabled")
+            acciones_menu.entryconfig("Mostrar Doctores en Especialidades", state="disabled") 
         if current_user.role.lower() == "paciente":
             acciones_menu.entryconfig("Mis consultas", state="normal")
             acciones_menu.entryconfig("Registrar consulta", state="disabled")
