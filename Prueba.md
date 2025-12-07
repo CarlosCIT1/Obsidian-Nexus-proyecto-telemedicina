@@ -8,8 +8,6 @@ from nexus_care import NexusCare
 from usuarios import Usuario, hash_password  # si necesitas el hash
 from citas import Citas
 
-XDXDXDXDXDX
-
 bib = NexusCare()
 current_user = None  # objeto Usuario autenticado
 
