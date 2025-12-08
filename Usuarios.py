@@ -1,6 +1,6 @@
 # usuario.py
 from db_connection import get_conn
-from citas import Consulta
+from citas import Citas
 import hashlib
 
 def hash_password(password: str) -> str:
@@ -91,7 +91,7 @@ class Usuario:
                 WHERE p.usuario_id = %s AND p.devuelto = 0
             """, (self.id,))
             rows = cur.fetchall()
-            return [Consulta(r[0], r[1], r[2], r[3]) for r in rows]
+            return [Citas(r[0], r[1], r[2], r[3]) for r in rows]
         finally:
             cur.close()
             conn.close()
