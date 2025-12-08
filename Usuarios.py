@@ -1,3 +1,4 @@
+# usuario.py
 from db_connection import get_conn
 from citas import Consulta
 import hashlib
@@ -60,9 +61,9 @@ class Usuario:
         conn = get_conn()
         try:
             cur = conn.cursor()
-            cur.execute("SELECT us_clave, us_nombre, us_apellidos, us_correo, us_telefono, us_fechanac, us_sexo, us_rol, us_contrasena FROM usuarios WHERE us_nombre = %s", (nombre,))
+            cur.execute("SELECT us_clave, us_nombre FROM usuarios WHERE us_nombre = %s", (nombre,))
             r = cur.fetchone()
-            return cls(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8]) if r else None
+            return cls(r[0], r[1]) if r else None
         finally:
             cur.close()
             conn.close()
@@ -78,24 +79,6 @@ class Usuario:
         finally:
             cur.close()
             conn.close()
-
-    @classmethod
-    def eliminar_por_id(cls, user_id):
-        conn = get_conn()
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM usuarios WHERE us_clave = %s", (user_id,))
-        conn.commit()
-        return cursor.rowcount  # devuelve cuántos se eliminaron
-
-
-    @classmethod
-    def buscar_por_apellido(cls, apellido):
-        conn = get_conn()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM usuarios WHERE apellidos LIKE %s", (f"%{apellido}%",))
-        rows = cursor.fetchall()
-        return [cls(*row) for row in rows] if rows else []
-
 
     def obtener_libros_prestados(self):
         conn = get_conn()
