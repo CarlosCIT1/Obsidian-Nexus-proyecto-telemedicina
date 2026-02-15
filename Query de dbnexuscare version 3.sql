@@ -1,4 +1,4 @@
-=========================USUARIOS=======================
+--=========================USUARIOS=======================
 
 CREATE TABLE Usuarios (
     -- Clave Primaria y de Identidad
@@ -21,14 +21,14 @@ CREATE TABLE Usuarios (
     us_contrasena VARCHAR(255) NOT NULL
 );
 
-=====================ESPECIALIDADES====================
+--=====================ESPECIALIDADES====================
 
 CREATE TABLE Especialidades (
     es_clave INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     es_nombre VARCHAR(100) UNIQUE NOT NULL
 );
 
-=====================DOCTORES_ESPECIALIDADES========================
+--=====================DOCTORES_ESPECIALIDADES========================
 -- Nombre de la tabla intermedia cambiado a plural para consistencia
 CREATE TABLE Doctores_Especialidades (
     us_clave INT UNSIGNED NOT NULL, 
@@ -38,16 +38,16 @@ CREATE TABLE Doctores_Especialidades (
     
     -- Definición de Restricciones de Clave Foránea
     FOREIGN KEY (us_clave) 
-        REFERENCES Usuarios(us_clave) -- CORREGIDO: apuntando a Usuarios
+        REFERENCES Usuarios(us_clave) 
         ON DELETE CASCADE,
         
     FOREIGN KEY (es_clave) 
-        REFERENCES Especialidades(es_clave) -- CORREGIDO: apuntando a Especialidades
+        REFERENCES Especialidades(es_clave)
         ON DELETE RESTRICT
 );
 
 
-======================CONSULTAS========================
+--======================CONSULTAS========================
 
 CREATE TABLE Consultas (
     co_clave INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -76,4 +76,5 @@ CREATE TABLE Consultas (
     
     FOREIGN KEY (doctor_clave)
         REFERENCES Usuarios(us_clave)
+
 );
