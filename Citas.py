@@ -1,128 +1,143 @@
 from db_connection import get_conn
 
-class Citas:
-    def __init__(self, ci_clave, ci_especialidad, ci_fecha, ci_motivo=True):
-        self.id = ci_clave
-        self.ci_especialidad = ci_especialidad
-        self.ci_fecha = ci_fecha
-        self.ci_motivo = ci_motivo
+class Consulta:
+    def __init__(self, co_clave, diagnostico, motivo, estado, hora, fecha, tipo_consulta, paciente, doctor, nombre_paciente):
+        self.id = co_clave
+        self.diagnostico = diagnostico
+        self.motivo = motivo
+        self.estado = estado
+        self.hora = hora
+        self.fecha = fecha
+        self.tipo_consulta = tipo_consulta
+        self.paciente = paciente
+        self.doctor = doctor
+        self.nombre_paciente = nombre_paciente
 
-    def agendar(self, usuario_id):
-        conn = get_conn()
-        try:
-            cur = conn.cursor()
-            # Verificar disponibilidad actual
-            cur.execute("SELECT ci_motivo FROM citas WHERE id = %s FOR UPDATE", (self.id,))
-            row = cur.fetchone()
-            if not row:
-                return False
-            ci_motivo = bool(row[0])
-            if not ci_motivo:
-                return False
 
-            # Actualizar libro y crear préstamo
-            cur.execute("UPDATE citas SET ci_motivo = 0 WHERE id = %s", (self.id,))
-            cur.execute(
-                "INSERT INTO prestamos (usuario_id, libro_id) VALUES (%s, %s)",
-                (usuario_id, self.id)
-            )
-            conn.commit()
-            self.ci_motivo = False
-            return True
-        except Exception as e:
-            conn.rollback()
-            raise
-        finally:
-            cur.close()
-            conn.close()
-
-    def devolver(self, usuario_id):
-        conn = get_conn()
-        try:
-            cur = conn.cursor()
-            # Buscar préstamo no devuelto para este usuario y libro
-            cur.execute("""
-                SELECT id FROM prestamos
-                WHERE usuario_id = %s AND libro_id = %s AND devuelto = 0
-                ORDER BY fecha_prestamo DESC LIMIT 1
-            """, (usuario_id, self.id))
-            row = cur.fetchone()
-            if not row:
-                return False
-            prestamo_id = row[0]
-            cur.execute("UPDATE prestamos SET devuelto = 1, fecha_devolucion = NOW() WHERE id = %s", (prestamo_id,))
-            cur.execute("UPDATE citas SET ci_motivo = 1 WHERE id = %s", (self.id,))
-            conn.commit()
-            self.ci_motivo = True
-            return True
-        except Exception as e:
-            conn.rollback()
-            raise
-        finally:
-            cur.close()
-            conn.close()
-
-    # Métodos de clase para CRUD
     @classmethod
-    def crear(cls, ci_especialidad, ci_fecha):
+    def crear(cls, diagnostico, motivo, hora, fecha, tipo_consulta, paciente, doctor):
         conn = get_conn()
         try:
             cur = conn.cursor()
-            cur.execute("INSERT INTO citas (ci_especialidad, ci_fecha) VALUES (%s, %s)", (ci_especialidad, ci_fecha))
+            cur.execute("""
+                INSERT INTO consultas (
+                    co_diagnostico, co_motivo, co_hora, co_fecha,
+                    co_tipo_consulta, paciente_clave, doctor_clave 
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (diagnostico, motivo, hora, fecha, tipo_consulta, paciente, doctor))
+
             conn.commit()
-            lid = cur.lastrowid
-            return cls(lid, ci_especialidad, ci_fecha, True)
+            cid = cur.lastrowid
+            
+            # ⬅️ CORRECCIÓN 1: Se añade 'None' para el argumento 'nombre_paciente' que faltaba.
+            return cls(cid, diagnostico, motivo, "Pendiente", hora, fecha, tipo_consulta, paciente, doctor, None)
+        
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
 
     @classmethod
     def listar_todos(cls):
         conn = get_conn()
         try:
             cur = conn.cursor()
-            cur.execute("SELECT id, ci_especialidad, ci_fecha, ci_motivo FROM citas ORDER BY ci_especialidad")
+            cur.execute("""
+                SELECT 
+                    c.co_clave, c.co_diagnostico, c.co_motivo, c.co_estado,
+                    c.co_hora, c.co_fecha, c.co_tipo_consulta,
+                    c.paciente_clave, c.doctor_clave,
+                    u.us_nombre
+                FROM consultas c
+                JOIN usuarios u ON u.us_clave = c.paciente_clave;
+            """)
+
+            filas = cur.fetchall()
+            consultas = []
+
+            for fila in filas:
+                co_clave, diagnostico, motivo, estado, hora, fecha, tipo_consulta, paciente, doctor, nombre_paciente = fila
+                consulta = cls(
+                    co_clave, diagnostico, motivo, estado,
+                    hora, fecha, tipo_consulta, paciente, doctor, nombre_paciente
+                )
+                consultas.append(consulta)
+
+            return consultas
+
+        finally:
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+                
+    @staticmethod
+    def listar_por_paciente(id_paciente):
+        conn = None
+        cur = None
+        try:
+            conn = get_conn()
+            cur = conn.cursor(dictionary=True)
+
+            cur.execute("""
+                SELECT 
+                    co_clave, 
+                    co_diagnostico AS diagnostico, 
+                    co_motivo AS motivo, 
+                    co_estado AS estado,
+                    co_hora AS hora, 
+                    co_fecha AS fecha, 
+                    co_tipo_consulta AS tipo_consulta, 
+                    paciente_clave AS paciente,      
+                    doctor_clave AS doctor,          
+                    NULL AS nombre_paciente  
+                FROM consultas
+                WHERE paciente_clave = %s 
+                ORDER BY co_fecha DESC
+            """, (id_paciente,))
+
             rows = cur.fetchall()
-            return [cls(r[0], r[1], r[2], r[3]) for r in rows]
+            return [Consulta(**row) for row in rows]
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
 
-    @classmethod
-    def buscar_por_ci_especialidad(cls, ci_especialidad):
-        conn = get_conn()
+class ConsultaPaciente:
+    def __init__(self, fecha, hora, doctor):
+        self.fecha = fecha
+        self.hora = hora
+        self.doctor = doctor
+
+    @staticmethod
+    def obtener_por_paciente(id_paciente):
+        conn = None
+        cur = None
         try:
+            conn = get_conn()
             cur = conn.cursor()
-            cur.execute("SELECT id, ci_especialidad, ci_fecha, ci_motivo FROM citas WHERE ci_especialidad = %s", (ci_especialidad,))
-            r = cur.fetchone()
-            return cls(r[0], r[1], r[2], r[3]) if r else None
-        finally:
-            cur.close()
-            conn.close()
 
-    @classmethod
-    def Eliminar_libro(cls, ci_especialidad):
-        conn = get_conn()
-        try :
-            cur = conn.cursor()
-            cur.execute("DELETE FROM citas WHERE ci_especialidad = %s", (ci_especialidad,))
-            conn.commit()
-        finally:
-            cur.close()
-            conn.close()
+            cur.execute("""
+                SELECT co_fecha, co_hora, u.us_nombre
+                FROM consultas c
+                -- ⬅️ CORRECCIÓN 4: Se especifica el alias 'u.' para evitar ambigüedad en el JOIN
+                JOIN usuarios u ON u.us_clave = c.doctor_clave 
+                WHERE paciente_clave = %s
+                ORDER BY co_fecha, co_hora
+            """, (id_paciente,))
 
-    @classmethod
-    def buscar_por_id(cls, ci_clave):
-        conn = get_conn()
-        try:
-            cur = conn.cursor()
-            cur.execute("SELECT id, ci_especialidad, ci_fecha, ci_motivo FROM citas WHERE id = %s", (ci_clave,))
-            r = cur.fetchone()
-            return cls(r[0], r[1], r[2], r[3]) if r else None
-        finally:
-            cur.close()
-            conn.close()
+            rows = cur.fetchall()
 
-    def __str__(self):
-        status = "Motivo" if self.ci_motivo else "-------"
-        return f"{self.ci_especialidad} - {self.ci_fecha} ({status})"
+            resultado = []
+            for fecha, hora, doctor in rows:
+                obj = ConsultaPaciente(fecha, hora, doctor)
+                resultado.append(obj)
+
+            return resultado
+        finally:
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
