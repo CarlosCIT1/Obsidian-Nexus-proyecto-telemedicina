@@ -1,4 +1,5 @@
 import sys
+import os
 from db_connection import get_conn
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
@@ -11,6 +12,11 @@ from citas import ConsultaPaciente
 bib = NexusCare()
 current_user = None  #
 
+# Calcula la ruta absoluta del directorio donde se está ejecutando el script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Concatena la ruta hacia tu carpeta de imágenes
+IMG_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "imgs"))
+
 def login_inicial():
     """Ventana gráfica de login estilo registrar usuario."""
     global current_user
@@ -18,14 +24,20 @@ def login_inicial():
     win = tk.Toplevel()
     win.title("Iniciar sesión")
     win.geometry("500x400")
-    win.resizable(False, False)
-
+    win.resizable(False, False)    
     # ======== Imágenes ========
-    img_logo1 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care_LOGO_SOLO-removebg-preview.png")
+    
+    # Imagen 1: Logo cuadrado (80x80)
+    img_path_1 = os.path.join(IMG_DIR, "Nexus_Care_LOGO_SOLO-removebg-preview.jpeg")
+    img_logo1 = Image.open(img_path_1)
+    # Aplicamos el resize aquí para no perder el control del tamaño
     img_logo1 = img_logo1.resize((80, 80), Image.Resampling.LANCZOS)
     img_logo1_tk = ImageTk.PhotoImage(img_logo1)
 
-    img_logo2 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care-removebg-preview.png")
+    # Imagen 2: Logo rectangular (230x80)
+    img_path_2 = os.path.join(IMG_DIR, "Nexus_Care-removebg-preview.jpeg")
+    img_logo2 = Image.open(img_path_2)
+    # Aplicamos el resize aquí
     img_logo2 = img_logo2.resize((230, 80), Image.Resampling.LANCZOS)
     img_logo2_tk = ImageTk.PhotoImage(img_logo2)
 
@@ -125,12 +137,16 @@ def registrar_usuario_publico():
     win.geometry("600x500")
     win.resizable(False, False)
 
-    # ======== Cargar imágenes ========
-    img_salida3 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care_LOGO_SOLO-removebg-preview.png")
+# ======== Cargar imágenes ========
+    # Usamos os.path.join para combinar la ruta de la carpeta con el nombre del archivo
+    
+    img_path_3 = os.path.join(IMG_DIR, "Nexus_Care_LOGO_SOLO-removebg-preview.jpeg")
+    img_salida3 = Image.open(img_path_3)
     img_salida3 = img_salida3.resize((70, 70), Image.Resampling.LANCZOS)
     img_salida3_tk = ImageTk.PhotoImage(img_salida3)
 
-    img_salida4 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care-removebg-preview.png")
+    img_path_4 = os.path.join(IMG_DIR, "Nexus_Care-removebg-preview.jpeg")
+    img_salida4 = Image.open(img_path_4)
     img_salida4 = img_salida4.resize((220, 70), Image.Resampling.LANCZOS)
     img_salida4_tk = ImageTk.PhotoImage(img_salida4)
 
@@ -285,12 +301,16 @@ def registrar_usuario():
     win.geometry("600x500")
     win.resizable(False, False)
 
-    # ======== Cargar imágenes ========
-    img_salida3 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care_LOGO_SOLO-removebg-preview.png")
+# ======== Cargar imágenes ========
+    # Usamos os.path.join para combinar la ruta de la carpeta con el nombre del archivo
+    
+    img_path_3 = os.path.join(IMG_DIR, "Nexus_Care_LOGO_SOLO-removebg-preview.jpeg")
+    img_salida3 = Image.open(img_path_3)
     img_salida3 = img_salida3.resize((70, 70), Image.Resampling.LANCZOS)
     img_salida3_tk = ImageTk.PhotoImage(img_salida3)
 
-    img_salida4 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care-removebg-preview.png")
+    img_path_4 = os.path.join(IMG_DIR, "Nexus_Care-removebg-preview.jpeg")
+    img_salida4 = Image.open(img_path_4)
     img_salida4 = img_salida4.resize((220, 70), Image.Resampling.LANCZOS)
     img_salida4_tk = ImageTk.PhotoImage(img_salida4)
 
@@ -423,12 +443,16 @@ def modificar_usuario():
     win.geometry("600x550")
     win.resizable(False, False)
 
-    # ======== Cargar imágenes ========
-    img_s1 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care_LOGO_SOLO-removebg-preview.png")
+# ======== Cargar imágenes ========
+    # Imagen 1
+    img_path_s1 = os.path.join(IMG_DIR, "Nexus_Care_LOGO_SOLO-removebg-preview.jpeg")
+    img_s1 = Image.open(img_path_s1)
     img_s1 = img_s1.resize((70, 70), Image.Resampling.LANCZOS)
     img_s1_tk = ImageTk.PhotoImage(img_s1)
 
-    img_s2 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care-removebg-preview.png")
+    # Imagen 2
+    img_path_s2 = os.path.join(IMG_DIR, "Nexus_Care-removebg-preview.jpeg")
+    img_s2 = Image.open(img_path_s2)
     img_s2 = img_s2.resize((220, 70), Image.Resampling.LANCZOS)
     img_s2_tk = ImageTk.PhotoImage(img_s2)
 
@@ -492,6 +516,7 @@ def modificar_usuario():
     ).grid(row=0, column=2, padx=10)
 
     # ---------- Guardar cambios ----------
+    # ---------- Guardar cambios ----------
     def guardar_cambios():
         if not hasattr(win, "usr_actual"):
             messagebox.showwarning("Aviso", "Debe buscar un usuario primero.")
@@ -501,10 +526,12 @@ def modificar_usuario():
         nuevo_nombre = entradas["Nombre"].get().strip()
         nuevo_apellidos = entradas["Apellidos"].get().strip()
         nuevo_correo = entradas["Correo"].get().strip()
-        nuevo_telefono = entradas["Teléfono"].get().strip()
+        nuevo_telefono = entradas["Telefono"].get().strip() # <-- Variable ya corregida sin acento
         nuevo_role = entradas["Rol (Paciente/Doctor/Admin)"].get().strip()
         nueva_pwd = entradas["Contraseña (opcional)"].get().strip()
 
+        conn = None
+        cur = None
         try:
             conn = get_conn()
             cur = conn.cursor()
@@ -523,8 +550,6 @@ def modificar_usuario():
                 """, (nuevo_nombre, nuevo_apellidos, nuevo_correo, nuevo_role, usr.id))
 
             conn.commit()
-            cur.close()
-            conn.close()
 
             messagebox.showinfo("OK", "Usuario modificado correctamente.")
             listar_usuarios()
@@ -532,7 +557,12 @@ def modificar_usuario():
 
         except Exception as e:
             messagebox.showerror("Error", f"{e}")
-
+        finally:
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+                
     tk.Button(
         frame, text="Guardar",
         background="#3a7bd5", activebackground="#5ba8f5",
@@ -653,19 +683,25 @@ def agregar_especialidad():
             messagebox.showwarning("Falta nombre", "Debes ingresar un nombre para la especialidad.")
             return
 
+        conn = None
+        c = None
         try:
             conn = get_conn()
             c = conn.cursor()
             c.execute("INSERT INTO especialidades (es_nombre) VALUES (%s)", (nom,))
             conn.commit()
-            conn.close()
 
             messagebox.showinfo("OK", "Especialidad agregada correctamente.")
             win.destroy()
 
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo agregar la especialidad:\n{e}")
-
+        finally:
+            if 'c' in locals() and c is not None:
+                c.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+                
     tk.Button(frame, text="Guardar", bg="#3a7bd5", fg="white", command=guardar).grid(row=2, column=0, columnspan=2, pady=15)
 
 @requiere_admin
@@ -697,6 +733,8 @@ def modificar_especialidad():
             messagebox.showwarning("Falta dato", "Ingresa un ID o nombre de especialidad.")
             return
 
+        conn = None
+        c = None
         try:
             conn = get_conn()
             c = conn.cursor()
@@ -709,7 +747,6 @@ def modificar_especialidad():
             """, (val, val))
 
             esp = c.fetchone()
-            conn.close()
 
             if not esp:
                 messagebox.showerror("No encontrado", "No existe esa especialidad.")
@@ -726,6 +763,11 @@ def modificar_especialidad():
 
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo buscar:\n{e}")
+        finally:
+            if 'c' in locals() and c is not None:
+                c.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
 
     def guardar():
         if not hasattr(win, "esp_id"):
@@ -739,6 +781,8 @@ def modificar_especialidad():
             messagebox.showwarning("Falta nombre", "El nombre no puede quedar vacío.")
             return
 
+        conn = None
+        c = None
         try:
             conn = get_conn()
             c = conn.cursor()
@@ -748,14 +792,18 @@ def modificar_especialidad():
                 WHERE es_clave = %s
             """, (nuevo_nom, nuevo_desc, win.esp_id))
             conn.commit()
-            conn.close()
 
             messagebox.showinfo("OK", "Especialidad modificada.")
             win.destroy()
 
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo modificar:\n{e}")
-
+        finally:
+            if 'c' in locals() and c is not None:
+                c.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+                
     tk.Button(frame, text="Buscar", bg="#4caf50", fg="white", command=buscar).grid(row=3, column=0, columnspan=2, pady=5)
     tk.Button(frame, text="Guardar cambios", bg="#3a7bd5", fg="white", command=guardar).grid(row=4, column=0, columnspan=2, pady=10)
 
@@ -782,51 +830,65 @@ def eliminar_especialidad():
         if not messagebox.askyesno("Confirmar", "¿Seguro que deseas eliminar esta especialidad?"):
             return
 
+        conn = None
+        c = None
         try:
             conn = get_conn()
             c = conn.cursor()
             c.execute("DELETE FROM especialidades WHERE es_clave = %s OR es_nombre = %s", (val, val))
             conn.commit()
-            conn.close()
 
             messagebox.showinfo("OK", "Especialidad eliminada.")
             win.destroy()
 
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo eliminar:\n{e}")
-
+        finally:
+            if 'c' in locals() and c is not None:
+                c.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+                
     tk.Button(frame, text="Eliminar", bg="#ef5350", fg="white", command=eliminar).pack(pady=15)
 
 def mostrar_especialidades():
     """Muestra todas las especialidades registradas en una tabla Tk."""
-    from tkinter import ttk
-    conn = get_conn()
-    cur = conn.cursor()
+    from tkinter import ttk, messagebox
+    
+    conn = None
+    cur = None
+    try:
+        conn = get_conn()
+        cur = cur = conn.cursor()
 
-    cur.execute("SELECT es_clave, es_nombre FROM especialidades ORDER BY es_clave")
+        cur.execute("SELECT es_clave, es_nombre FROM especialidades ORDER BY es_clave")
+        filas = cur.fetchall()
 
-    filas = cur.fetchall()
+        # Ventana
+        win = tk.Toplevel()
+        win.title("Listado de Especialidades")
+        win.geometry("450x300")
 
-    # Ventana
-    win = tk.Toplevel()
-    win.title("Listado de Especialidades")
-    win.geometry("450x300")
+        # Tabla
+        tabla = ttk.Treeview(win, columns=("ID", "Nombre"), show="headings")
+        tabla.heading("ID", text="ID")
+        tabla.heading("Nombre", text="Nombre")
+        tabla.column("ID", width=60)
+        tabla.column("Nombre", width=300)
+        tabla.pack(fill="both", expand=True)
 
-    # Tabla
-    tabla = ttk.Treeview(win, columns=("ID", "Nombre"), show="headings")
-    tabla.heading("ID", text="ID")
-    tabla.heading("Nombre", text="Nombre")
-    tabla.column("ID", width=60)
-    tabla.column("Nombre", width=300)
-    tabla.pack(fill="both", expand=True)
+        # Insertar datos
+        for fila in filas:
+            tabla.insert("", "end", values=fila)
 
-    # Insertar datos
-    for fila in filas:
-        tabla.insert("", "end", values=fila)
-
-    cur.close()
-    conn.close()
-
+    except Exception as e:
+        messagebox.showerror("Error", f"No se pudieron cargar las especialidades:\n{e}")
+    finally:
+        if 'cur' in locals() and cur is not None:
+            cur.close()
+        if 'conn' in locals() and conn is not None and conn.is_connected():
+            conn.close()
+            
 def registrar_doctor_especialidad():
     win = tk.Toplevel()
     win.title("Asignar Especialidad a Doctor")
@@ -843,6 +905,9 @@ def registrar_doctor_especialidad():
     cb_esp.pack(pady=5)
 
     # --- CARGAR DOCTORES ---
+    # --- CARGAR DOCTORES ---
+    conn = None
+    cur = None
     try:
         conn = get_conn()
         cur = conn.cursor()
@@ -858,9 +923,6 @@ def registrar_doctor_especialidad():
         lista_doctores = [f"{d[0]} - {d[1]} {d[2]}" for d in doctores] if doctores else []
         cb_doctor["values"] = lista_doctores
 
-        cur.close()
-        conn.close()
-
         if not doctores:
             cb_doctor["values"] = ["(No hay doctores registrados)"]
             cb_doctor.current(0)
@@ -870,8 +932,15 @@ def registrar_doctor_especialidad():
         messagebox.showerror("Error", f"No se pudieron cargar doctores:\n{e}")
         win.destroy()
         return
-
+    finally:
+        if 'cur' in locals() and cur is not None:
+            cur.close()
+        if 'conn' in locals() and conn is not None and conn.is_connected():
+            conn.close()
     # --- CARGAR ESPECIALIDADES ---
+    # --- CARGAR ESPECIALIDADES ---
+    conn = None
+    cur = None
     try:
         conn = get_conn()
         cur = conn.cursor()
@@ -882,9 +951,6 @@ def registrar_doctor_especialidad():
         lista_esps = [f"{e[0]} - {e[1]}" for e in especialidades] if especialidades else []
         cb_esp["values"] = lista_esps
 
-        cur.close()
-        conn.close()
-
         if not especialidades:
             cb_esp["values"] = ["(No hay especialidades registradas)"]
             cb_esp.current(0)
@@ -894,7 +960,13 @@ def registrar_doctor_especialidad():
         messagebox.showerror("Error", f"No se pudieron cargar especialidades:\n{e}")
         win.destroy()
         return
+    finally:
+        if 'cur' in locals() and cur is not None:
+            cur.close()
+        if 'conn' in locals() and conn is not None and conn.is_connected():
+            conn.close()
 
+    # --- GUARDAR ASIGNACIÓN ---
     # --- GUARDAR ASIGNACIÓN ---
     def guardar():
         d_sel = cb_doctor.get()
@@ -911,6 +983,8 @@ def registrar_doctor_especialidad():
             messagebox.showwarning("Error", "Selección inválida.")
             return
 
+        conn = None
+        cur = None
         try:
             conn = get_conn()
             cur = conn.cursor()
@@ -923,8 +997,6 @@ def registrar_doctor_especialidad():
 
             if cur.fetchone():
                 messagebox.showinfo("Aviso", "Este doctor ya tiene esa especialidad.")
-                cur.close()
-                conn.close()
                 return
 
             # Insertar relación
@@ -934,22 +1006,30 @@ def registrar_doctor_especialidad():
             """, (doctor_id, esp_id))
 
             conn.commit()
-            cur.close()
-            conn.close()
 
             messagebox.showinfo("OK", "Especialidad asignada correctamente.")
             win.destroy()
 
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo asignar la especialidad:\n{e}")
-
+        finally:
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+                
     tk.Button(win, text="Asignar especialidad", font=("Arial", 10), command=guardar).pack(pady=15)
 
 def mostrar_doctores_por_especialidad():
+    # Inicializamos variables para el bloque finally
+    conn = None
+    cursor = None
+    
     try:
         conn = get_conn()
         cursor = conn.cursor(dictionary=True)
 
+        # Tu consulta optimizada con LEFT JOIN (¡Muy buena!)
         query = """
         SELECT 
             e.es_clave AS id_especialidad,
@@ -982,16 +1062,22 @@ def mostrar_doctores_por_especialidad():
                 lb_output.insert(tk.END, "----------------------------------------")
 
             if fila["id_doctor"] is None:
-                lb_output.insert(tk.END, "   (Sin doctores asignados)")
+                lb_output.insert(tk.END, "    (Sin doctores asignados)")
             else:
                 lb_output.insert(
                     tk.END,
-                    f"   • {fila['nombre_doctor']} {fila['apellidos_doctor']} (ID: {fila['id_doctor']})"
+                    f"    • {fila['nombre_doctor']} {fila['apellidos_doctor']} (ID: {fila['id_doctor']})"
                 )
 
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al consultar:\n{e}")
-
+        
+    finally:
+        # El cierre seguro para no saturar el pool
+        if cursor is not None:
+            cursor.close()
+        if conn is not None and conn.is_connected():
+            conn.close()
 
 # --- Consultas / Consulta (antes 'libros' en tu código) ---
 
@@ -1002,12 +1088,16 @@ def registrar_consulta():
     win.geometry("600x520")
     win.resizable(False, False)
 
-    # ========== Cargar imágenes ==========
-    img1 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care_LOGO_SOLO-removebg-preview.png")
+# ========== Cargar imágenes ==========
+    # Imagen 1
+    img_path1 = os.path.join(IMG_DIR, "Nexus_Care_LOGO_SOLO-removebg-preview.jpeg")
+    img1 = Image.open(img_path1)
     img1 = img1.resize((70, 70), Image.Resampling.LANCZOS)
     img1_tk = ImageTk.PhotoImage(img1)
 
-    img2 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care-removebg-preview.png")
+    # Imagen 2
+    img_path2 = os.path.join(IMG_DIR, "Nexus_Care-removebg-preview.jpeg")
+    img2 = Image.open(img_path2)
     img2 = img2.resize((220, 70), Image.Resampling.LANCZOS)
     img2_tk = ImageTk.PhotoImage(img2)
 
@@ -1143,12 +1233,16 @@ def modificar_consulta():
     win.geometry("550x420")
     win.resizable(False, False)
 
-    # ======== Cargar imágenes ========
-    img1 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care_LOGO_SOLO-removebg-preview.png")
+# ========== Cargar imágenes ==========
+    # Imagen 1
+    img_path1 = os.path.join(IMG_DIR, "Nexus_Care_LOGO_SOLO-removebg-preview.jpeg")
+    img1 = Image.open(img_path1)
     img1 = img1.resize((70, 70), Image.Resampling.LANCZOS)
     img1_tk = ImageTk.PhotoImage(img1)
 
-    img2 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care-removebg-preview.png")
+    # Imagen 2
+    img_path2 = os.path.join(IMG_DIR, "Nexus_Care-removebg-preview.jpeg")
+    img2 = Image.open(img_path2)
     img2 = img2.resize((220, 70), Image.Resampling.LANCZOS)
     img2_tk = ImageTk.PhotoImage(img2)
 
@@ -1206,6 +1300,7 @@ def modificar_consulta():
     ).grid(row=0, column=2, padx=10)
 
     # ---------------- MODIFICAR CONSULTA ----------------
+    # ---------------- MODIFICAR CONSULTA ----------------
     def guardar():
         if not hasattr(win, "consulta_actual"):
             messagebox.showwarning("Aviso", "Debe buscar una consulta primero.")
@@ -1216,6 +1311,8 @@ def modificar_consulta():
             messagebox.showwarning("Aviso", "Debe ingresar una fecha.")
             return
 
+        conn = None
+        cur = None
         try:
             conn = __import__('db_connection').get_conn()
             cur = conn.cursor()
@@ -1226,8 +1323,6 @@ def modificar_consulta():
             )
 
             conn.commit()
-            cur.close()
-            conn.close()
 
             messagebox.showinfo("OK", "Consulta modificada correctamente.")
             listar_consultas()
@@ -1235,7 +1330,12 @@ def modificar_consulta():
 
         except Exception as e:
             messagebox.showerror("Error", f"Error al modificar consulta:\n{e}")
-
+        finally:
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+                
     tk.Button(
         frame, text="Guardar cambios",
         background="#3a7bd5", activebackground="#5ba8f5",
@@ -1286,13 +1386,13 @@ def eliminar_consulta():
         if not messagebox.askyesno("Confirmar", f"¿Eliminar la consulta con ID = {id_cons}?"):
             return
 
+        conn = None
+        cur = None
         try:
             conn = __import__('db_connection').get_conn()
             cur = conn.cursor()
             cur.execute("DELETE FROM consultas WHERE co_clave = %s", (id_cons,))
             conn.commit()
-            cur.close()
-            conn.close()
 
             messagebox.showinfo("OK", f"Consulta con ID {id_cons} eliminada.")
             win.destroy()
@@ -1302,7 +1402,12 @@ def eliminar_consulta():
 
         except Exception as e:
             messagebox.showerror("Error", f"Error al eliminar consulta:\n{e}")
-
+        finally:
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+                
     tk.Button(win, text="Eliminar", bg="#c0392b", fg="white",
               font=("Arial", 12), width=12, command=eliminar).pack(pady=5)
 
@@ -1313,28 +1418,22 @@ def eliminar_consulta():
 # --- Listados / Agendado (médico y admin) ---
 
 def listar_usuarios():
+    # 1. Definimos las variables fuera del try para que existan siempre
+    conn = None
+    cur = None
     try:
         conn = get_conn()
         cur = conn.cursor()
 
-        # Si el usuario conectado es doctor → solo pacientes
+        # Tu lógica de consulta
         if current_user.role.lower() == "doctor":
-            cur.execute("""
-                SELECT us_clave, us_nombre, us_apellidos, us_correo, us_telefono, us_rol
-                FROM usuarios
-                WHERE us_rol = 'Paciente'
-            """)
+            cur.execute("SELECT us_clave, us_nombre, us_apellidos, us_correo, us_telefono, us_rol FROM usuarios WHERE us_rol = 'Paciente'")
         else:
-            # Admin y otros ven todo
-            cur.execute("""
-                SELECT us_clave, us_nombre, us_apellidos, us_correo, us_telefono, us_rol
-                FROM usuarios
-            """)
+            cur.execute("SELECT us_clave, us_nombre, us_apellidos, us_correo, us_telefono, us_rol FROM usuarios")
 
         usuarios = cur.fetchall()
-        cur.close()
-        conn.close()
 
+        # 2. Procesamos los resultados
         lb_output.delete(0, tk.END)
         lb_output.insert(tk.END, "Usuarios:")
 
@@ -1345,8 +1444,14 @@ def listar_usuarios():
 
     except Exception as e:
         messagebox.showerror("Error", f"Error al listar usuarios:\n{e}")
-
-
+    
+    finally:
+        # 3. EL BLINDAJE: Esto se ejecuta SÍ O SÍ, ocurra lo que ocurra.
+        if cur is not None:
+            cur.close()
+        if conn is not None and conn.is_connected():
+            conn.close()
+            
 def listar_consultas():
     try:
         consultas = Consulta.listar_todos()
@@ -1563,11 +1668,16 @@ frame_output.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
 
 # Imagen al lado del label "Salida" --------
 # Cargar imagen
-img_salida = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care_LOGO_SOLO-removebg-preview.png")
+# ======== Cargar imágenes ========
+# Imagen Logo Solo (Cuadrado)
+img_path_salida = os.path.join(IMG_DIR, "Nexus_Care_LOGO_SOLO-removebg-preview.jpeg")
+img_salida = Image.open(img_path_salida)
 img_salida = img_salida.resize((70, 70), Image.Resampling.LANCZOS)
 img_salida_tk = ImageTk.PhotoImage(img_salida)
 
-img_salida2 = Image.open("C:/Users/maryf/OneDrive/Escritorio/Imagenes Tópicos/Nexus_Care-removebg-preview.png")
+# Imagen Logo Completo (Rectangular)
+img_path_salida2 = os.path.join(IMG_DIR, "Nexus_Care-removebg-preview.jpeg")
+img_salida2 = Image.open(img_path_salida2)
 img_salida2 = img_salida2.resize((220, 70), Image.Resampling.LANCZOS)
 img_salida2_tk = ImageTk.PhotoImage(img_salida2)
 
