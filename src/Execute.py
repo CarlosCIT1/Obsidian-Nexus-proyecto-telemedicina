@@ -8,13 +8,13 @@ from medicos import NexusCare
 from usuarios import Usuario, hash_password
 from citas import Consulta
 from citas import ConsultaPaciente
+import matplotlib.pyplot as plt
 
 bib = NexusCare()
 current_user = None  #
 
 # Calcula la ruta absoluta del directorio donde se está ejecutando el script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 # Concatena la ruta hacia tu carpeta de imágenes
 IMG_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "imgs"))
 
@@ -249,7 +249,15 @@ def registrar_usuario_publico():
             role = 'Paciente'
 
         pwd = entry_pwd.get()
+        telefono = entry_telefono.get().strip()
 
+        if not telefono.isdigit():
+            messagebox.showerror("Error", "El teléfono solo debe contener números.")
+            return
+
+        if len(telefono) != 10:
+            messagebox.showerror("Error", "El teléfono debe tener 10 dígitos.")
+            return
         u = Usuario.crear(nombre, apellidos, correo, telefono or None, fechanac, sexo, role, pwd)
         resultado["user"] = u
 
