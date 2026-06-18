@@ -1,6 +1,5 @@
-# usuario.py
 from db_connection import get_conn
-from citas import Citas
+from citas import Consulta
 import hashlib
 
 def hash_password(password: str) -> str:
@@ -40,8 +39,10 @@ class Usuario:
             return cls(uid, nombre, apellidos, correo, telefono, fechanac, sexo, role, pwd_hash)
 
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
 
 
     @classmethod
@@ -53,20 +54,24 @@ class Usuario:
             rows = cur.fetchall()
             return [cls(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8]) for r in rows]
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
 
     @classmethod
     def buscar_por_nombre(cls, nombre):
         conn = get_conn()
         try:
             cur = conn.cursor()
-            cur.execute("SELECT us_clave, us_nombre FROM usuarios WHERE us_nombre = %s", (nombre,))
+            cur.execute("SELECT us_clave, us_nombre, us_apellidos, us_correo, us_telefono, us_fechanac, us_sexo, us_rol, us_contrasena FROM usuarios WHERE us_nombre = %s", (nombre,))
             r = cur.fetchone()
-            return cls(r[0], r[1]) if r else None
+            return cls(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8]) if r else None
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
 
     @classmethod
     def buscar_por_id(cls, id_):
@@ -77,8 +82,44 @@ class Usuario:
             r = cur.fetchone()
             return cls(r[0], r[1]) if r else None
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+
+    @classmethod
+    def eliminar_por_id(cls, user_id):
+        conn = None
+        cursor = None
+        try:
+            conn = get_conn()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM usuarios WHERE us_clave = %s", (user_id,))
+            conn.commit()
+            return cursor.rowcount  # devuelve cuántos se eliminaron
+        finally:
+            if 'cursor' in locals() and cursor is not None:
+                cursor.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+
+
+    @classmethod
+    def buscar_por_apellido(cls, apellido):
+        conn = None
+        cursor = None
+        try:
+            conn = get_conn()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM usuarios WHERE apellidos LIKE %s", (f"%{apellido}%",))
+            rows = cursor.fetchall()
+            return [cls(*row) for row in rows] if rows else []
+        finally:
+            if 'cursor' in locals() and cursor is not None:
+                cursor.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
+
 
     def obtener_libros_prestados(self):
         conn = get_conn()
@@ -91,10 +132,12 @@ class Usuario:
                 WHERE p.usuario_id = %s AND p.devuelto = 0
             """, (self.id,))
             rows = cur.fetchall()
-            return [Citas(r[0], r[1], r[2], r[3]) for r in rows]
+            return [Consulta(r[0], r[1], r[2], r[3]) for r in rows]
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
 
     @classmethod
     def autenticar(cls, nombre, password):
@@ -127,8 +170,10 @@ class Usuario:
                 return None
 
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
 
 
 
