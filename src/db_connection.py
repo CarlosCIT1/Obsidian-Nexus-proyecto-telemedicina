@@ -19,6 +19,7 @@ DB_CONFIG = {
 POOL_NAME = os.getenv("POOL_NAME", "nexuscare_pool")
 POOL_SIZE = int(os.getenv("POOL_SIZE", 5))
 
+# Crear pool
 try:
     pool = pooling.MySQLConnectionPool(
         pool_name=POOL_NAME,
@@ -34,33 +35,17 @@ except Error as e:
 def get_conn():
     if pool is None:
         raise Exception("El pool de conexiones no está disponible.")
-    
+
     conn = pool.get_connection()
-    
-    # Debug: Mostrar estado tras PRESTAR una conexión
-    mostrar_estado_pool("PRESTADA")
     return conn
 
-def release_conn(conn):
-    if conn and conn.is_connected():
-        conn.close()  # Devuelve la conexión al pool
-        
-        # Debug: Mostrar estado tras DEVOLVER una conexión
-        mostrar_estado_pool("DEVUELTA")
 
-def mostrar_estado_pool(accion):
+def release_conn(conn):
     """
-    Calcula y muestra cuántas conexiones hay libres y ocupadas.
+    Devuelve la conexión al pool cerrándola correctamente.
     """
-    # El tamaño total del pool
-    total = pool.pool_size
-    # Conexiones disponibles en la cola interna
-    disponibles = pool._pool_queue.qsize()
-    # Conexiones ocupadas (Total - Disponibles)
-    ocupadas = total - disponibles
-    
-    print(f"\n--- ESTADO DEL POOL ({accion}) ---")
-    print(f"Total configurado: {total}")
-    print(f"Disponibles:       {disponibles}")
-    print(f"Ocupadas:          {ocupadas}")
-    print("================================")
+    try:
+        if conn and conn.is_connected():
+            conn.close()
+    except Exception as e:
+        print(f"Error al liberar conexión: {e}")
