@@ -14,6 +14,7 @@ current_user = None  #
 
 # Calcula la ruta absoluta del directorio donde se está ejecutando el script
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Concatena la ruta hacia tu carpeta de imágenes
 IMG_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "imgs"))
 
