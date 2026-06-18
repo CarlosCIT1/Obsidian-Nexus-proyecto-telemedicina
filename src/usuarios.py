@@ -1,6 +1,7 @@
 from db_connection import get_conn
 from citas import Consulta
 import hashlib
+import re
 
 def hash_password(password: str) -> str:
         if password is None:
@@ -21,6 +22,19 @@ class Usuario:
 
     @classmethod
     def crear(cls, nombre, apellidos, correo, telefono, fechanac, sexo, role, password=None):
+
+        # ===== VALIDACIÓN TELÉFONO =====
+        if telefono is not None:
+            telefono = str(telefono).strip()
+
+            # Solo números
+            if not telefono.isdigit():
+                raise ValueError("El teléfono solo debe contener números.")
+
+            # Longitud (Varchar 10 en tu DB)
+            if len(telefono) != 10:
+                raise ValueError("El teléfono debe tener exactamente 10 dígitos.")
+
         conn = get_conn()
         try:
             cur = conn.cursor()
@@ -43,7 +57,6 @@ class Usuario:
                 cur.close()
             if 'conn' in locals() and conn is not None and conn.is_connected():
                 conn.close()
-
 
     @classmethod
     def listar_todos(cls):
