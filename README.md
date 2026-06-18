@@ -16,6 +16,6 @@ El script de creación de la base de datos se encuentra en:
 dbnexuscare.sql
 
 ## Autores
-- Carlos — Base de datos y modelo entidad-relación (MER)
+- Carlos — Desarrollo en Python, Base de datos y modelo entidad-relación (MER)
 - Luis Angel — Desarrollo en Python
 - Said Emmanuel — Diseño de interfaz en Figma
