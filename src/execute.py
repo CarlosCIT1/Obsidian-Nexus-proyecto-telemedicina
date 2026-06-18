@@ -1563,8 +1563,95 @@ def grafica_roles_usuarios():
 
     plt.show()
 
+@requiere_admin
+def abrir_reporte_errores():
+    win = tk.Toplevel()
+    win.title("Reportes de errores")
+    win.geometry("600x450")
+    win.resizable(False, False)
 
+    # ======== CARGAR IMÁGENES ========
+    img_path_s1 = os.path.join(IMG_DIR, "Nexus_Care_LOGO_SOLO-removebg-preview.jpeg")
+    img_s1 = Image.open(img_path_s1)
+    img_s1 = img_s1.resize((70, 70), Image.Resampling.LANCZOS)
+    img_s1_tk = ImageTk.PhotoImage(img_s1)
 
+    img_path_s2 = os.path.join(IMG_DIR, "Nexus_Care-removebg-preview.jpeg")
+    img_s2 = Image.open(img_path_s2)
+    img_s2 = img_s2.resize((220, 70), Image.Resampling.LANCZOS)
+    img_s2_tk = ImageTk.PhotoImage(img_s2)
+
+    frame_imgs = ttk.Frame(win)
+    frame_imgs.pack(pady=20)
+
+    ttk.Label(frame_imgs, image=img_s1_tk).pack(side="left", padx=10)
+    ttk.Label(frame_imgs, image=img_s2_tk).pack(side="left", padx=10)
+
+    win.img1 = img_s1_tk
+    win.img2 = img_s2_tk
+
+    # ======== FORMULARIO ========
+    frame = ttk.Frame(win, padding=20)
+    frame.pack(fill="both", expand=True)
+
+    # --- Título ---
+    ttk.Label(frame, text="Título:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+    entry_titulo = tk.Entry(
+        frame,
+        width=40,
+        highlightthickness=2,
+        highlightbackground="#5F9BE0",
+        highlightcolor="green"
+    )
+    entry_titulo.grid(row=0, column=1, padx=5, pady=5)
+
+    # --- Fecha ---
+    ttk.Label(frame, text="Fecha (YYYY-MM-DD):").grid(row=1, column=0, sticky="w", padx=5, pady=5)
+    entry_fecha = tk.Entry(
+        frame,
+        width=40,
+        highlightthickness=2,
+        highlightbackground="#5F9BE0",
+        highlightcolor="green"
+    )
+    entry_fecha.grid(row=1, column=1, padx=5, pady=5)
+
+    # --- Descripción ---
+    ttk.Label(frame, text="Descripción:").grid(row=2, column=0, sticky="nw", padx=5, pady=5)
+    text_desc = tk.Text(
+        frame,
+        width=30,
+        height=6,
+        highlightthickness=2,
+        highlightbackground="#5F9BE0",
+        highlightcolor="green"
+    )
+    text_desc.grid(row=2, column=1, padx=5, pady=5)
+
+    # ======== ENVIAR ========
+    def enviar():
+        titulo = entry_titulo.get().strip()
+        fecha = entry_fecha.get().strip()
+        descripcion = text_desc.get("1.0", tk.END).strip()
+
+        if not titulo or not fecha or not descripcion:
+            messagebox.showwarning("Faltan datos", "Completa todos los campos.")
+            return
+
+        messagebox.showinfo("Enviado", "Reporte enviado con el proveedor")
+        win.destroy()
+
+    tk.Button(
+        frame,
+        text="Enviar",
+        background="#3a7bd5",
+        activebackground="#5ba8f5",
+        foreground="white",
+        font=("Arial", 8, "bold"),
+        relief="raised",
+        bd=4,
+        command=enviar
+    ).grid(row=3, column=0, columnspan=2, pady=20)
 
 def ajustar_menu_por_rol():
     """Habilita/deshabilita opciones del menú según el rol del usuario actual."""
@@ -1581,8 +1668,10 @@ def ajustar_menu_por_rol():
 
     if (current_user.role or "").lower() == 'admin':
         acciones_menu.entryconfig("Gráfica de usuarios por rol", state="normal")
+        acciones_menu.entryconfig("Reportes de errores", state="normal")
     else:
         acciones_menu.entryconfig("Gráfica de usuarios por rol", state="disabled")
+        acciones_menu.entryconfig("Reportes de errores", state="disabled")
 
     if (current_user.role or "").lower() == 'admin':
         # Admin: habilitar todo
@@ -1662,6 +1751,8 @@ acciones_menu.add_separator()
 acciones_menu.add_command(label="Mis consultas", command=ver_consultas_paciente)
 acciones_menu.add_separator()
 acciones_menu.add_command(label="Gráfica de usuarios por rol",command=grafica_roles_usuarios)
+acciones_menu.add_command(label="Reportes de errores", command=abrir_reporte_errores)
+
 menubar.add_cascade(label="Acciones", menu=acciones_menu)
 
 # Menú "Archivo" con Salir
