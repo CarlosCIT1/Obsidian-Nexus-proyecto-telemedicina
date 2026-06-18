@@ -22,5 +22,7 @@ class Especialidad:
             return cls(eid, nom_especialidad)
 
         finally:
-            cur.close()
-            conn.close()
+            if 'cur' in locals() and cur is not None:
+                cur.close()
+            if 'conn' in locals() and conn is not None and conn.is_connected():
+                conn.close()
